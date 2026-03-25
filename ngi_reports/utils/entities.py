@@ -144,6 +144,7 @@ class Flowcell:
         self.run_setup = self.fc_details.get("RunInfo").get("Reads")
         self.sample_sheet_data = self.fc_details.get("samplesheet_csv")
 
+        # TODO: change these to the centralised regex patterns when they are implemented
         if "000-" in self.name:
             self.type = "MiSeq"
             self.chemistry = {
