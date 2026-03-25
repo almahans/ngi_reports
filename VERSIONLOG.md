@@ -1,5 +1,8 @@
 # ngi_reports Version Log
 
+## 20260315.1
+Add basic support for MiSeqi100 projects
+
 ## 20251111.1
 Improvements to ONT project summary reports
 
