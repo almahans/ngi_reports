@@ -144,7 +144,8 @@ class Flowcell:
         self.run_setup = self.fc_details.get("RunInfo").get("Reads")
         self.sample_sheet_data = self.fc_details.get("samplesheet_csv")
 
-        if "-" in self.name:
+        # TODO: change these to the centralised regex patterns when they are implemented
+        if "000-" in self.name:
             self.type = "MiSeq"
             self.chemistry = {
                 "Chemistry": fc_runparameters.get(
@@ -194,6 +195,13 @@ class Flowcell:
                 "RTAVersion": fc_runparameters.get("RtaVersion"),
                 "ApplicationName": fc_runparameters.get("ApplicationName"),
                 "ApplicationVersion": fc_runparameters.get("ApplicationVersion"),
+            }
+        elif "-SC3" in self.name:
+            self.type = "MiSeqi100"
+            self.chemistry = {"RecipeName": fc_runparameters.get("RecipeName")}
+            self.seq_software = {
+                "ApplicationName": fc_runparameters.get("Application"),
+                "ApplicationVersion": fc_runparameters.get("SystemSuiteVersion"),
             }
 
         else:
@@ -684,6 +692,7 @@ class Project:
             "NextSeq 2000",
             "NovaSeq 6000",
             "NovaSeq X Plus",
+            "MiSeq i100",
         ]:
             self.sequencer_manufacturer = "illumina"
         elif proj_details.get("sequencing_platform") in ["PromethION", "MinION"]:
@@ -786,9 +795,9 @@ class Project:
             )
         elif self.sequencer_manufacturer == "ont":
             ontcon = statusdb.NanoporeRunConnection()
-            assert (
-                ontcon
-            ), "Could not connect to nanopore_runs (names) database in StatusDB"
+            assert ontcon, (
+                "Could not connect to nanopore_runs (names) database in StatusDB"
+            )
             flowcell_info = ontcon.get_project_flowcell(
                 self.ngi_id, self.dates["open_date"]
             )
@@ -828,9 +837,9 @@ class Project:
                 for fc_sample in fcObj.fc_sample_barcodes:
                     if fc_sample in self.samples.keys():
                         for prep in self.samples[fc_sample].preps:
-                            self.samples[fc_sample].preps[prep].barcode = (
-                                fcObj.fc_sample_barcodes[fc_sample]
-                            )
+                            self.samples[fc_sample].preps[
+                                prep
+                            ].barcode = fcObj.fc_sample_barcodes[fc_sample]
                         try:
                             self.samples[fc_sample].total_reads += float(
                                 fcObj.sample_reads[fc_sample]
