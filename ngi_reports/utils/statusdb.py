@@ -130,7 +130,6 @@ class GenericRunConnection(statusdb_connection):
             key=lambda k: datetime.strptime(k.split("_")[0], time_format),
             reverse=True,
         )
-        counter = 1
         for fc in date_sorted_fcs:
             if type(self) is NanoporeRunConnection:
                 # 20220721_1216_1G_PAM62368_3ae8de85
