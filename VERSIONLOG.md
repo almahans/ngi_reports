@@ -1,5 +1,8 @@
 # ngi_reports Version Log
 
+## 20260424.1
+Bugfix to include all runs of a project, covering for ONT reruns
+
 ## 20260315.1
 Add basic support for MiSeqi100 projects
 

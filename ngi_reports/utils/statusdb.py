@@ -130,6 +130,7 @@ class GenericRunConnection(statusdb_connection):
             key=lambda k: datetime.strptime(k.split("_")[0], time_format),
             reverse=True,
         )
+        counter = 1
         for fc in date_sorted_fcs:
             if type(self) is NanoporeRunConnection:
                 # 20220721_1216_1G_PAM62368_3ae8de85
@@ -142,11 +143,8 @@ class GenericRunConnection(statusdb_connection):
                 fc_date, fc_name = fc.split("_")
             if datetime.strptime(fc_date, time_format) < open_date:
                 break
-            if (
-                project_id in self.proj_list[fc]
-                and fc_name not in project_flowcells.keys()
-            ):
-                project_flowcells[fc_name] = {
+            if project_id in self.proj_list[fc]:
+                project_flowcells[fc] = {
                     "name": fc_name,
                     "run_name": fc,
                     "date": fc_date,
