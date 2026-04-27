@@ -120,21 +120,14 @@ class GenericRunConnection(statusdb_connection):
             open_date = datetime.strptime("2015-01-01", "%Y-%m-%d")
 
         project_flowcells = {}
-        time_format = (
-            "%Y%m%d"
-            if type(self) in (NanoporeRunConnection, ElementRunConnection)
-            else "%y%m%d"
-        )
+        time_format = "%Y%m%d" if type(self) is ElementRunConnection else "%y%m%d"
         date_sorted_fcs = sorted(
             list(self.proj_list.keys()),
             key=lambda k: datetime.strptime(k.split("_")[0], time_format),
             reverse=True,
         )
         for fc in date_sorted_fcs:
-            if type(self) is NanoporeRunConnection:
-                # 20220721_1216_1G_PAM62368_3ae8de85
-                fc_date, fc_time, position, fc_name, fc_hash = fc.split("_")
-            elif type(self) is ElementRunConnection:
+            if type(self) is ElementRunConnection:
                 # 20250417_AV242106_A2440533805
                 fc_date, sequencer_id, fc_name = fc.split("_")
             else:
@@ -142,8 +135,11 @@ class GenericRunConnection(statusdb_connection):
                 fc_date, fc_name = fc.split("_")
             if datetime.strptime(fc_date, time_format) < open_date:
                 break
-            if project_id in self.proj_list[fc]:
-                project_flowcells[fc] = {
+            if (
+                project_id in self.proj_list[fc]
+                and fc_name not in project_flowcells.keys()
+            ):
+                project_flowcells[fc_name] = {
                     "name": fc_name,
                     "run_name": fc,
                     "date": fc_date,
@@ -189,3 +185,38 @@ class NanoporeRunConnection(GenericRunConnection):
             ).get_result()["rows"]
             if row["key"]
         }
+
+    def get_project_flowcell(
+        self, project_id, open_date="2015-01-01", date_format="%Y-%m-%d"
+    ):
+        """From information available in flowcell db connection collect the flowcell this project was sequenced
+
+        :param project_id: NGI project ID to get the flowcells
+        :param open_date: Open date of project to skip the check for all flowcells
+        :param date_format: The format of specified open_date
+        """
+        try:
+            open_date = datetime.strptime(open_date, date_format)
+        except TypeError:
+            open_date = datetime.strptime("2015-01-01", "%Y-%m-%d")
+
+        project_flowcells = {}
+        time_format = "%Y%m%d"
+        date_sorted_fcs = sorted(
+            list(self.proj_list.keys()),
+            key=lambda k: datetime.strptime(k.split("_")[0], time_format),
+            reverse=True,
+        )
+        for fc in date_sorted_fcs:
+            # 20220721_1216_1G_PAM62368_3ae8de85
+            fc_date, fc_time, position, fc_name, fc_hash = fc.split("_")
+            if datetime.strptime(fc_date, time_format) < open_date:
+                break
+            if project_id in self.proj_list[fc]:
+                project_flowcells[fc] = {
+                    "name": fc_name,
+                    "run_name": fc,
+                    "date": fc_date,
+                    "db": self.dbname,
+                }
+        return project_flowcells
