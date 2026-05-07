@@ -1,5 +1,8 @@
 # ngi_reports Version Log
 
+## 20260507.1
+Changed lane yield to only passed reads for ONT runs
+
 ## 20260424.1
 Bugfix to include all runs of a project, covering for ONT reruns
 
