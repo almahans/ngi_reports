@@ -442,7 +442,7 @@ class Flowcell:
         yield_summary = final_acquisition.get("acquisition_run_info").get(
             "yield_summary"
         )
-        self.total_reads = round(float(yield_summary.get("read_count")) / 1000000, 2)
+        self.total_reads = round(float(yield_summary.get("basecalled_pass_read_count")) / 1000000, 2)
 
         ont_seq_versions = fc_runparameters.get("software_versions", "")
         self.seq_software = {

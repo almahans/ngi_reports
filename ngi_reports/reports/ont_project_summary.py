@@ -123,7 +123,7 @@ class Report(ngi_reports.reports.project_summary.Report):
         self.tables_info["header_explanation"]["lanes_info"] = (
             "* _Date:_ Date of sequencing\n"
             "* _Flowcell:_ Flowcell identifier\n"
-            "* _Reads (M):_ Number of reads generated (million)\n"
+            "* _Reads (M):_ Number of passed reads generated (million)\n"
             "* _N50:_ Estimated N50\n"
             "* _Method:_ Sequencing method used. See description under Sequencing heading above.\n"
         )
